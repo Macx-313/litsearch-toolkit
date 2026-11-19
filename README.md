@@ -1,6 +1,19 @@
 # PubMed Semantic Search Toolkit
 
-A complete pipeline for building a local semantic search engine over **28+ million PubMed abstracts** using the open-source Qwen3-Embedding-8B model. Query in natural language (Chinese or English), get back relevant PMIDs in milliseconds.
+A complete pipeline for building a local semantic search engine over **28+ million PubMed abstracts** using the open-source Qwen3-Embedding-8B model, plus a companion index for the **11.7 million title-only records** that carry no abstract. Query in natural language (Chinese or English), get back relevant PMIDs in milliseconds.
+
+## Where the data is
+
+This repo is **code only** (0.16 MB, 56 files). The prebuilt vector indexes are on ModelScope:
+
+| Dataset | Contents | Size |
+|---|---|---|
+| [litsearch-pubmed-full](https://modelscope.cn/datasets/Macx313/litsearch-pubmed-full) | 28,337,072 abstract vectors | 589 GB (550 GiB) |
+| [litsearch-pubmed-titles](https://modelscope.cn/datasets/Macx313/litsearch-pubmed-titles) | 11,657,916 title-only vectors | 246 GB (229 GiB) |
+
+Together they cover **39,994,988 = 100%** of the PubMed 2026-01 baseline. The two libraries are disjoint — download either, or both for full coverage. Each ships with `CHECKSUMS.md5`; verify before use.
+
+Text layer (titles/abstracts) is **not** included for licensing reasons — rebuild it from the NLM baseline with `scripts/parse_all.py`.
 
 ## Performance (measured, independently verified)
 
@@ -19,7 +32,7 @@ Evaluation set: 31 known target papers (aSDH/sICH seeds), each described as 3 qu
 | Query latency (fast mode) | ~32ms p50 |
 | End-to-end single query | ~4s (including CPU encoding) |
 
-The 3 missed targets have no abstract in PubMed (title-only records) and are therefore not in the corpus by design — the corpus only indexes abstracts.
+The 3 missed targets have no abstract in PubMed (title-only records) and are therefore not in the abstract corpus by design. They are the reason the companion index `litsearch-pubmed-titles` exists: queried together, the two libraries recover **30/31**.
 
 ## Architecture
 
